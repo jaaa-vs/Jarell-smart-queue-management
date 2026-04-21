@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Queue - Smart Queue</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="live-container">
+        <div id="current-display" class="pulse">-</div>
+        
+        <div class="lists-container">
+            <div id="waiting-section" class="list-section">
+                <h2 class="list-title">CURRENT WAITING (Max 5)</h2>
+                <ul id="waiting-list"></ul>
+            </div>
+            
+            <div id="next-section" class="list-section">
+                <h2 class="list-title">NEXT BATCH</h2>
+                <ul id="next-list"></ul>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-generate" onclick="generateNumber()">Generate Number</button>
+            <button class="btn btn-call" onclick="callNext()">Call Next</button>
+            <button class="btn btn-serve" id="serve-btn" onclick="serveCurrent()" disabled>[SERVE] Done</button>
+            <button class="btn btn-reset" onclick="resetQueue()">Reset Queue</button>
+        </div>
+
+        <div id="status" class="status-connecting">Loading...</div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let refreshTimer;
+        checkStatus && checkStatus();
+        refreshLive && refreshLive();
+        refreshTimer = setInterval(() => {
+            refreshLive && refreshLive();
+        }, 3000);
+        
+        document.getElementById('serve-btn').disabled = true;
+    </script>
+</body>
+</html>

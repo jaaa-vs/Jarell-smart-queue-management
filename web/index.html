@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Smart Queue v4.0 - Professional Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎫</text></svg>">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">SmartQueue <span style="font-size:0.7em">v4.0</span></div>
+            <div class="tagline">
+                <i class="fas fa-circle" style="color:#4caf50;font-size:0.6em;"></i> 
+                Live • Professional • Responsive
+            </div>
+        </div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('live')">
+            <i class="fas fa-tachometer-alt"></i> Live Queue
+        </button>
+        <button class="tab-btn" onclick="showTab('history')">
+            <i class="fas fa-history"></i> History
+        </button>
+        <button class="tab-btn" onclick="showTab('display')">
+            <i class="fas fa-tv"></i> External Display
+        </button>
+        <button class="tab-btn" onclick="toggleTheme()">
+            <i class="fas fa-moon"></i> Theme
+        </button>
+    </div>
+
+    <!-- LIVE TAB -->
+    <div id="live" class="tab-content active">
+        <div class="queue-container">
+            <div class="status-bar">
+                <div class="stat-item">
+                    <span class="stat-number" id="waiting-count">0</span>
+                    <span class="stat-label">Waiting</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="next-count">0</span>
+                    <span class="stat-label">Next Batch</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="served-count">0</span>
+                    <span class="stat-label">Served Today</span>
+                </div>
+            </div>
+
+            <div class="current-number">
+                <div id="current-display" class="fade-in">-</div>
+            </div>
+
+            <div class="lists-grid">
+                <div class="list-card">
+                    <div class="list-header">
+                        <i class="fas fa-clock"></i>
+                        Current Waiting
+                    </div>
+                    <ul id="waiting-list" class="list-items"></ul>
+                </div>
+                <div class="list-card">
+                    <div class="list-header">
+                        <i class="fas fa-forward"></i>
+                        Next Batch
+                    </div>
+                    <ul id="next-list" class="list-items"></ul>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generateNumber()" data-original="Generate Number">
+                    <i class="fas fa-plus"></i> Generate Number
+                </button>
+                <button class="btn btn-success" onclick="callNext()" data-original="Call Next">
+                    <i class="fas fa-bullhorn"></i> Call Next
+                </button>
+                <button class="btn btn-success" id="serve-btn" onclick="serveCurrent()" disabled data-original="[SERVE] Done">
+                    <i class="fas fa-check"></i> [SERVE] Done
+                </button>
+                <button class="btn btn-danger" onclick="resetQueue()" data-original="Reset Queue">
+                    <i class="fas fa-trash"></i> Reset Queue
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; opacity: 0.7; font-size: 0.9rem;">
+                ⌨️ G = Generate | N = Next | S = Serve | R = Reset
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div id="history" class="tab-content">
+        <div class="queue-container history-container">
+            <div class="list-header" style="margin-bottom: 2rem;">
+                <i class="fas fa-history"></i> Queue History (Last 50)
+            </div>
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-hashtag"></i> Queue #</th>
+                        <th><i class="fas fa-clock"></i> Generated</th>
+                        <th><i class="fas fa-phone"></i> Called</th>
+                        <th><i class="fas fa-check-circle"></i> Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="refreshHistory()">
+                    <i class="fas fa-sync"></i> Refresh History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXTERNAL DISPLAY TAB -->
+    <div id="display" class="tab-content">
+        <div style="text-align: center; padding: 2rem;">
+            <i class="fas fa-external-link-alt" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <h2 style="margin-bottom: 1rem;">External Display Ready</h2>
+            <p>Open in fullscreen on second monitor/HDMI:</p>
+            <div style="background: var(--glass); padding: 1.5rem; border-radius: var(--radius); margin: 2rem 0;">
+                <div style="font-size: 1.2rem; margin-bottom: 1rem;">
+                    <i class="fas fa-link"></i> http://localhost:8080/display.html
+                </div>
+                <button class="btn btn-primary" onclick="window.open('/display.html', '_blank', 'fullscreen=yes')">
+                    <i class="fas fa-expand"></i> Open Fullscreen
+                </button>
+            </div>
+            <div style="opacity: 0.7; font-size: 0.9rem;">
+                Pro tip: F11 or browser kiosk mode for permanent display
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        // Tab switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+        }
+
+        // History functions (from app.js)
+        async function refreshHistory() {
+            // Implemented in app.js
+        }
+    </script>
+</body>
+</html>

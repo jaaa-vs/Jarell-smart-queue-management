@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue History - Smart Queue v4.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="queue-container history-container" style="max-width: 1400px; margin: 2rem auto; min-height: 80vh;">
+        <div class="list-header" style="margin-bottom: 2rem;">
+            <i class="fas fa-history"></i> Complete Queue History
+            <span style="float: right; font-size: 0.9rem; opacity: 0.7;">Auto refresh every 10s</span>
+        </div>
+        
+        <div id="history-loading" style="text-align: center; padding: 4rem;">
+            <div class="spinner" style="width: 48px; height: 48px; margin: 0 auto 1rem; border-width: 4px;"></div>
+            <p>Loading history...</p>
+        </div>
+        
+        <table id="history-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th style="width: 20%;"><i class="fas fa-hashtag"></i> Number</th>
+                    <th style="width: 25%;"><i class="fas fa-clock"></i> Generated</th>
+                    <th style="width: 25%;"><i class="fas fa-phone"></i> Called</th>
+                    <th style="width: 30%;"><i class="fas fa-info-circle"></i> Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn btn-primary" onclick="refreshHistory()" id="refresh-btn">
+                <i class="fas fa-sync-alt"></i> Refresh Now
+            </button>
+        </div>
+    </div>
+
+    <div class="toast-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        // History-specific
+        async function refreshHistory() {
+            const btn = document.getElementById('refresh-btn');
+            const table = document.getElementById('history-table');
+            const loading = document.getElementById('history-loading');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Refreshing...';
+            
+            try {
+                const response = await fetch('/api/history');
+                const data = await response.json();
+                
+                const tbody = table.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                (data.data || []).forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${row[0]}</strong></td>
+                        <td>${row[1]}</td>
+                        <td>${row[2] || '-'}</td>
+                        <td><span class="status-badge status-${row[3]}">${row[3].toUpperCase()}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                loading.style.display = 'none';
+                table.style.display = 'table';
+                
+                showToast(`Updated ${data.data?.length || 0} records`, 'info');
+            } catch (error) {
+                showToast('Failed to load history', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Now';
+            }
+        }
+
+        // Auto refresh
+        refreshHistory();
+        setInterval(refreshHistory, 10000);
+    </script>
+</body>
+</html>
