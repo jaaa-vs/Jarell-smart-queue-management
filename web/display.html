@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Smart Queue Display</title>
+<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            height: 100%;
-            overflow: hidden;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { 
+            height: 100%; 
+            overflow: hidden; 
             background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 50%, #3a3a4e 100%);
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            touch-action: manipulation;
         }
-        
         .container {
             height: 100vh;
             display: flex;
@@ -29,8 +33,6 @@
             gap: 1.5vmin;
             position: relative;
         }
-        
-        /* FIXED "NOW SERVING" - No Animation */
         .now-serving {
             font-size: clamp(1.5rem, 3.5vw, 2.5rem);
             font-weight: 700;
@@ -41,7 +43,6 @@
             margin-bottom: 0.5vmin;
             text-shadow: 0 1px 5px rgba(16, 185, 129, 0.3);
         }
-        
         .main-number {
             font-size: clamp(8rem, 20vw, 28vw);
             font-weight: 800;
@@ -52,126 +53,62 @@
             border-radius: 1.5rem;
             backdrop-filter: blur(15px);
             border: 0.15rem solid rgba(255,255,255,0.15);
-            box-shadow: 
-                0 1.5rem 3rem rgba(0,0,0,0.4),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow: 0 1.5rem 3rem rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
             margin: 0 auto;
             transition: all 0.4s ease;
+            min-height: 15vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
         .main-number.active {
             background: rgba(16,185,129,0.12);
             border-color: rgba(16,185,129,0.4);
             color: #10b981;
-            box-shadow: 
-                0 0 2rem rgba(16,185,129,0.3),
-                0 1.5rem 3rem rgba(0,0,0,0.4);
+            box-shadow: 0 0 2rem rgba(16,185,129,0.3), 0 1.5rem 3rem rgba(0,0,0,0.4);
         }
-        
-        /* Lists - Compact */
-        .lists {
-            display: flex;
-            width: clamp(70vw, 85vw, 90vw);
-            gap: 1.5vmin;
-            justify-content: center;
-            flex-wrap: wrap;
+        .lists { 
+            display: flex; 
+            width: clamp(70vw, 85vw, 90vw); 
+            gap: 1.5vmin; 
+            justify-content: center; 
+            flex-wrap: wrap; 
             margin-top: 1.5vmin;
         }
-        
         .panel {
-            flex: 1 1 30vmin;
-            min-width: 22vmin;
-            background: rgba(30, 30, 60, 0.7);
-            padding: 2vmin;
-            border-radius: 1.2rem;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 1rem 2rem rgba(0,0,0,0.3);
-            height: 28vmin;
-            display: flex;
-            flex-direction: column;
+            flex: 1 1 30vmin; min-width: 22vmin; background: rgba(30, 30, 60, 0.7);
+            padding: 2vmin; border-radius: 1.2rem; backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 1rem 2rem rgba(0,0,0,0.3);
+            height: 28vmin; display: flex; flex-direction: column;
         }
-        
         .panel-title {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 1.5vmin;
-            color: white;
-            opacity: 0.9;
-            letter-spacing: 0.03em;
+            font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 600; text-align: center;
+            margin-bottom: 1.5vmin; color: white; opacity: 0.9; letter-spacing: 0.03em;
         }
-        
         .panel-list {
-            flex: 1;
-            list-style: none;
-            overflow-y: auto;
-            padding-right: 0.3vmin;
-            font-size: clamp(1.4rem, 4vw, 2.2rem);
-            font-weight: 600;
-            line-height: 1.2;
+            flex: 1; list-style: none; overflow-y: auto; padding-right: 0.3vmin;
+            font-size: clamp(1.4rem, 4vw, 2.2rem); font-weight: 600; line-height: 1.2;
         }
-        
         .panel-list li {
-            padding: 0.8vmin 1.2vmin;
-            margin-bottom: 0.8vmin;
-            background: rgba(255,255,255,0.08);
-            border-radius: 0.8rem;
-            border-left: 0.3rem solid #10b981;
-            backdrop-filter: blur(10px);
+            padding: 0.8vmin 1.2vmin; margin-bottom: 0.8vmin; background: rgba(255,255,255,0.08);
+            border-radius: 0.8rem; border-left: 0.3rem solid #10b981; backdrop-filter: blur(10px);
             transition: all 0.2s ease;
         }
-        
-        .panel-list li:nth-child(even) {
-            border-left-color: #3b82f6;
-            background: rgba(59,130,246,0.12);
-        }
-        
-        /* Status - Smaller */
+        .panel-list li:nth-child(even) { border-left-color: #3b82f6; background: rgba(59,130,246,0.12); }
         .status {
-            position: absolute;
-            bottom: 1.5vmin;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: clamp(0.9rem, 2vw, 1.2rem);
-            color: rgba(255,255,255,0.6);
-            background: rgba(0,0,0,0.3);
-            padding: 0.8vmin 1.5vmin;
-            border-radius: 1.5rem;
-            backdrop-filter: blur(10px);
-            white-space: nowrap;
+            position: absolute; bottom: 1.5vmin; left: 50%; transform: translateX(-50%);
+            font-size: clamp(0.9rem, 2vw, 1.2rem); color: rgba(255,255,255,0.6);
+            background: rgba(0,0,0,0.3); padding: 0.8vmin 1.5vmin; border-radius: 1.5rem;
+            backdrop-filter: blur(10px); white-space: nowrap;
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .lists {
-                flex-direction: column;
-                width: 92vw;
-                gap: 1vmin;
-            }
-            
-            .panel {
-                height: 25vmin;
-            }
-        }
-        
-        @media (max-height: 700px) {
-            .container {
-                gap: 1vmin;
-                padding: 1vmin;
-            }
-            
-            .panel {
-                height: 24vmin;
-            }
-        }
+        @media (max-width: 768px) { .lists { flex-direction: column; width: 92vw; gap: 1vmin; } .panel { height: 25vmin; } }
+        @media (max-height: 700px) { .container { gap: 1vmin; padding: 1vmin; } .panel { height: 24vmin; } }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="now-serving" id="now-serving">NOW SERVING</div>
         <div class="main-number" id="main-number">-</div>
-        
         <div class="lists">
             <div class="panel">
                 <div class="panel-title">CURRENT WAITING</div>
@@ -183,11 +120,9 @@
             </div>
         </div>
     </div>
-    
     <div class="status">
         <span id="status-time"></span> | <span id="waiting-num">0</span> waiting | <span id="next-num">0</span> next
     </div>
-
     <script>
         async function refresh() {
             try {
@@ -196,29 +131,21 @@
                     fetch('/api/calling').then(r=>r.json()),
                     fetch('/api/nextbatch').then(r=>r.json())
                 ]);
-                
                 const main = document.getElementById('main-number');
                 const num = calling.data?.[0] || '-';
                 main.textContent = num;
                 main.classList.toggle('active', num !== '-');
-                
                 fillList('waiting-list', waiting.data || []);
                 fillList('next-list', nextbatch.data || []);
-                
                 document.getElementById('waiting-num').textContent = waiting.data?.length || 0;
                 document.getElementById('next-num').textContent = nextbatch.data?.length || 0;
                 document.getElementById('status-time').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-            } catch(e) {
-                document.getElementById('main-number').textContent = 'OFFLINE';
-            }
+            } catch(e) { document.getElementById('main-number').textContent = 'OFFLINE'; }
         }
-        
         function fillList(id, data) {
             const list = document.getElementById(id);
             list.innerHTML = data.slice(0, 8).map(item => `<li>${item}</li>`).join('');
         }
-        
         refresh();
         setInterval(refresh, 1500);
     </script>
